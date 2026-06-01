@@ -3,6 +3,7 @@ import csv
 from pathlib import Path
 from print_layer import PrintLayer
 from print_mode import PrintMode
+from image_source import ImageSource
 from print_layer_summary import PrintSummary
 
 def main():
@@ -33,6 +34,13 @@ def main():
         choices=["supervised", "automatic"],
         help="Execution mode: 'supervised' or 'automatic' (default: automatic)"
     )
+    parser.add_argument(
+        "--image-source", "-i",
+        type=str,
+        default="local",
+        choices=["local", "cloud"],
+        help="Where the print layer images should be sourced from: 'local' or 'cloud' (default: local). Local is faster and better for testing."
+    )
 
     args = parser.parse_args()
 
@@ -43,6 +51,14 @@ def main():
         print("mode: automatic")
         print_mode = PrintMode.AUTOMATIC
 
+        
+    if args.image_source == "cloud":
+        print("fetching print layer images from the Formlabs Google Drive")
+        image_source = ImageSource.CLOUD
+    else:
+        print("fetching print layer images from /images")
+        image_source = ImageSource.LOCAL
+
     # path to the print gcode (or in this case, the csv file)
     print_layers_data_path = Path("fl_coding_challenge_v1.csv")
 
@@ -50,7 +66,7 @@ def main():
     print_layers_output_path = Path(args.output_folder) / (args.print_name + ".jsonl")
 
     # start processing the gcode
-    print_summary = process_print_layers(print_layers_data_path, print_layers_output_path, print_mode)
+    print_summary = process_print_layers(print_layers_data_path, print_layers_output_path, print_mode, image_source)
 
     # print summary
     print(f"total print height: {print_summary.print_height:.3f}")
@@ -59,7 +75,7 @@ def main():
     for print_error in print_summary.get_errors():
         print(f"\t{print_error}")
 
-def process_print_layers(print_layers_data_path: Path, print_layers_output_path: Path, print_mode: PrintMode):
+def process_print_layers(print_layers_data_path: Path, print_layers_output_path: Path, print_mode: PrintMode, image_source: ImageSource):
     print_summary = PrintSummary()
 
     with open(print_layers_data_path, "r", encoding="utf-8") as f:
@@ -79,7 +95,7 @@ def process_print_layers(print_layers_data_path: Path, print_layers_output_path:
                 if print_mode == PrintMode.SUPERVISED:
                     print("Press \"Enter\" to print the next layer:")
                     input()
-                print_layer = PrintLayer.from_csv_row(row)
+                print_layer = PrintLayer.from_csv_row(row, image_source)
                 
                 layer_summary = process_print_layer(print_layer, out_file, print_mode)
 

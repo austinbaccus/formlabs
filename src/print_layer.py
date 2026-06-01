@@ -1,4 +1,5 @@
-from image import fetch_image_local, image_to_file, image_to_string
+from image import fetch_image_local, fetch_image_web, image_to_string
+from image_source import ImageSource
 
 
 class PrintLayer:
@@ -45,11 +46,18 @@ class PrintLayer:
         self._image_data = image_data
 
     @classmethod
-    def from_csv_row(cls, row: list[str]) -> 'PrintLayer':
+    def from_csv_row(cls, row: list[str], image_source: ImageSource) -> 'PrintLayer':
         """Construct a PrintLayer instance from a fixed-order CSV row."""
         file_name = row[16].strip()
         image_url = row[17].strip()
-        image_data = fetch_image_local("images", file_name)
+
+        # retrieve the image data
+        if image_source == ImageSource.LOCAL:
+            image_data = fetch_image_local("images", file_name)
+        else:
+            image_data = fetch_image_web(image_url)
+        
+        # convert image data to a string so it can be stored in the output file
         if image_data is not None:
             image_data_str = image_to_string(image_data)
         else:

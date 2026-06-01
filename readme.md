@@ -1,15 +1,45 @@
-# fakeprint
+# FakePrint
 
-## how to run
+This is a Formlabs take-home test.
 
-`cd` into the `formlabs` directory
+## How To Run
 
-Linux & Raspberry Pi
 ```
-python3 src/main.py --print-name "formlabs_test" --output-folder ./output --mode "supervised"
+git clone https://github.com/austinbaccus/formlabs.git
+cd formlabs
 ```
 
-Windows
+### Linux & Raspberry Pi
 ```
-python src\main.py --print-name "formlabs_test" --output-folder ./output --mode "automatic"
+python3 src/main.py --print-name "formlabs_test" --output-folder ./output --mode "supervised" --image-source "cloud"
+```
+
+### Windows
+```
+python src\main.py --print-name "formlabs_test" --output-folder ./output --mode "automatic" --image-source "local"
+```
+
+## Design Considerations
+
+### Multi-platform Support
+I added support for Windows, but I also want this to work on Linux. Specifically, I want this to work with Raspberry Pi machines, since they were mentioned in the instructions. 
+
+I've added more details (including screenshots) in the `misc` folder.
+
+### Condensed image data in output file
+The original format for each print layer image is 8-bit depth PNG. This results in a typical file size of around 9KB. I wanted to include the image data in the output file, so making each image as small as possible was my goal. I implemented two changes to make this happen:
+
+1. Changed bit-depth to 1 instead of 8
+2. Converted all images to `.TIFF`
+
+`TIFF` had a slightly smaller file size than `PNG` in my testing, which is why I chose it over `PNG`. I chose 1-bit pixel depth because I noticed all images were black and white with no greyscale... so why not go with 1-bit color depth to save file space?
+
+### Support for reading images from local or cloud storage
+
+I added support for fetching images locally or from the Google Drive provided by the spec. The reason I added a local option was because it was a pain to sit for ~3 minutes to retrieve all the images.
+
+This can be selected via the CLI arguments:
+```
+ --image-source "cloud"
+ --image-source "local"
 ```
