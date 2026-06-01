@@ -1,3 +1,4 @@
+from pathlib import Path
 from image import fetch_image_local, fetch_image_web, image_to_string
 from image_source import ImageSource
 
@@ -53,7 +54,8 @@ class PrintLayer:
 
         # retrieve the image data
         if image_source == ImageSource.LOCAL:
-            image_data = fetch_image_local("images", file_name)
+            local_file_name = Path(file_name).with_suffix(".tiff").name
+            image_data = fetch_image_local("images", local_file_name)
         else:
             image_data = fetch_image_web(image_url)
         
