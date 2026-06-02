@@ -22,9 +22,9 @@ python src\main.py --print-name "formlabs_test" --output-folder ./output --mode 
 ### Supported Platforms
 | Platform | Supported |
 |----------|-----------|
-| Windows (64-bit) | ✅ |
-| Linux (64-bit) | ✅ |
-| Raspberry Pi (ARM) | ✅ |
+| Windows | ✅ |
+| Linux | ✅ |
+| Raspberry Pi | ✅ |
 
 # Design Considerations
 
